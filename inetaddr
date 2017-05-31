@@ -1,0 +1,286 @@
+#
+#  inet2hex and hex2inet by Chet Ramey <chet.ramey@case.edu>
+#
+#  All other functions by Derek Callaway <decal@sdf.org>
+#
+#  Copyright 2002 Chester Ramey
+#
+#  Copyright 2017 Derek Callaway
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2, or (at your option)
+#   any later version.
+#
+#   TThis program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software Foundation,
+#   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+#
+# inet2hex - Internet address conversion, dotted-decimal to hex
+#
+inet2hex ()
+{
+	local IFS=.
+
+	set -- $1
+
+	if (( $# != 4 )); then
+		echo "inet2hex: incorrect input format: $1" >&2
+		echo "inet2hex: usage: inet2hex XX.XX.XX.XX" >&2
+
+		return 2
+	fi
+  
+	printf "0x%02x%02x%02x%02x\n" $1 $2 $3 $4
+
+  return 0
+}
+
+decq2hex()
+{ 
+  inet2hex $* 
+}
+
+#
+# inet2hexq - dotted-decimal-quad to dotted-hex-quad
+#
+inet2hexq ()
+{
+  local IFS=.
+
+  set -- $1
+
+  if (( $# != 4 )); then
+    echo "inet2hexq: incorrect input format: $1" >&2
+    echo "inet2hexq: usage: inet2hexq XX.XX.XX.XX" >&2
+
+    return 2
+  fi
+
+  printf "0x%02x.0x%02x.0x%02x.0x%02x\n" $1 $2 $3 $4
+
+  return 0
+}
+
+decq2hexq()
+{ 
+  inet2hexq $*
+}
+
+#
+# inet2oct - dotted-decimal-quad to octal
+#
+inet2oct ()
+{
+  set -- $1
+
+  printf "0%o\n" $(inet2dec $1)
+
+  return 0
+}
+
+decq2oct()
+{ 
+  inet2oct $*
+}
+
+#
+# inet2octq - dotted-decimal-quad to dotted-octal-quad
+#
+inet2octq ()
+{
+  local IFS=.
+  
+  set -- $1
+
+  if (( $# != 4 )); then
+    echo "inet2octq: incorrect input format: $1" >&2
+    echo "inet2octq: usage: inet2octq XX.XX.XX.XX" >&2
+
+    return 2
+  fi
+
+  printf "0%o.0%o.0%o.0%o\n" $1 $2 $3 $4
+
+  return 0
+}
+
+decq2octq()
+{ 
+  inet2octq $*
+}
+
+#
+# inet2dec - dotted-quad to base10
+#
+inet2dec ()
+{
+  set -- $1
+
+  if (( $# != 1 )); then
+    echo "inet2dec: incorrect input format: $1" >&2
+    echo "inet2dec: usage: inet2dec XX.XX.XX.XX" >&2
+
+    return 2
+  fi
+  
+  printf "%d\n" $(inet2hex $1)
+
+  return 0
+}
+
+decq2dec()
+{ 
+  inet2dec $*
+}
+
+### NOTE: `inet2decq` and `decq2inet` would essentially be `inet2inet` which is `echo`
+
+#
+# dec2inet - base10 to dotted-quad
+#
+dec2inet()
+{
+  set -- $1
+
+  hex2inet $(printf "0x%x\n" $1)
+
+  return 0
+}
+
+dec2decq()
+{ 
+  dec2inet $*
+}
+
+#
+# hex2inet - Internet address conversion, hex to dotted-decimal
+#
+hex2inet ()
+{
+	local x1 x2 x3 x4 rev
+
+	OPTIND=1
+
+	while getopts "r" o
+	do
+		case "$o" in
+		r)	rev=true;;
+		*)	echo "hex2inet: usage: hex2inet [-r] [0x]XXXXXXXX" >&2 ; exit 2;;
+		esac
+	done
+
+	shift $(( $OPTIND - 1 ))
+
+	case "$1" in
+	0x*)	h=${1#??} ;;
+	*)	h=$1 ;;
+	esac
+
+	if (( ${#h} != 8 )); then
+		echo "hex2inet: $h not in inet format" >&2
+		echo "hex2inet: usage: hex2inet [0x]XXXXXXXX" >&2
+
+		return 2
+	fi
+
+	x1=$(( 0x${h:0:2} ))
+	x2=$(( 0x${h:2:2} ))
+	x3=$(( 0x${h:4:2} ))
+	x4=$(( 0x${h:6:2} ))
+
+	if [ -z "$rev" ]; then
+		printf "%d.%d.%d.%d\n" $x1 $x2 $x3 $x4 
+	else
+		printf "%d.%d.%d.%d\n" $x4 $x3 $x2 $x1 
+	fi
+
+	return 0
+}
+
+hex2decq()
+{ 
+  hex2inet $*
+}
+
+#
+# hexq2inet - dotted-hex-quad to dotted-decimal-quad
+#
+hexq2inet() {
+  set -- $1
+
+  oct2inet $(inet2oct $1)
+}
+
+hexq2decq()
+{ 
+  hexq2inet $*
+}
+
+#
+# oct2inet - octal to dotted-decimal-quad
+#
+oct2inet() {
+  set -- $1
+
+  hex2inet $(printf "0x%x\n" $1)
+}
+
+oct2decq()
+{ 
+  oct2inet $*
+}
+
+#
+# octq2inet - dotted-octal-quad to dotted-decimal-quad
+#
+
+octq2inet() {
+  local IFS=.
+
+  set -- $1
+
+  if(($# != 4)); then
+		echo "oct2inet: incorrect input format: $1" >&2
+		echo "oct2inet: usage: oct2inet XX.XX.XX.XX" >&2
+
+    return 2
+  fi
+
+  printf "%u.%u.%u.%u\n" $1 $2 $3 $4
+
+  return 0
+}
+
+octq2decq()
+{ 
+  octq2inet $*
+}
+
+#
+# octq2hexq - dotted-octal-quad to dotted-hex-quad
+#
+
+octq2hexq()
+{
+  set -- $1
+ 
+  inet2hexq $(octq2inet $1)
+}
+  
+#
+# hexq2octq - dotted-hex-quad to dotted-octal-quad
+#
+
+hexq2octq()
+{
+  set -- $1
+
+  inet2octq $(hexq2inet $1) 
+}
