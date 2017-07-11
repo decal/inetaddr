@@ -38,8 +38,6 @@ inet2hex ()
 	fi
   
 	printf "0x%02x%02x%02x%02x\n" $1 $2 $3 $4
-
-  return 0
 }
 
 decq2hex()

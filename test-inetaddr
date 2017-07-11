@@ -15,10 +15,10 @@ decq2hex 204.79.197.200
 inet2dec 192.168.1.1
 decq2dec 192.168.1.1
 
-inet2octq 127.0.0.1
-decq2octq 127.0.0.1
-inet2hexq 127.0.0.1
-decq2hexq 127.0.0.1
+inet2octq 172.16.0.1
+decq2octq 10.10.10.10
+inet2hexq 8.8.4.4
+decq2hexq 255.255.255.255
 
 octq2inet 0172.0.0.1
 octq2decq 0172.0.0.1
