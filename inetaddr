@@ -109,6 +109,10 @@ inet2octq ()
   return 0
 }
 
+#
+# dotted-decimal-quad to dotted-octal-quad
+#
+
 decq2octq()
 { 
   inet2octq $*
@@ -152,9 +156,49 @@ dec2inet()
   return 0
 }
 
+#
+# decimal to dotted-decimal-quad
+#
+
 dec2decq()
 { 
   dec2inet $*
+}
+
+#
+# decimal to hex
+#
+
+dec2hex()
+{
+  inet2hex $(dec2inet $1)
+}
+
+#
+# decimal to hex-dotted-quad
+#
+
+dec2hexq()
+{
+  inet2hexq $(dec2inet $1)
+}
+
+#
+# decimal to octal
+#
+
+dec2oct()
+{
+  inet2oct $(dec2inet $1)
+}
+
+#
+# decimal to octal-dotted-quad
+#
+
+dec2octq()
+{
+  inet2octq $(dec2inet $1)
 }
 
 #
@@ -202,9 +246,58 @@ hex2inet ()
 	return 0
 }
 
+#
+# hex to dotted-decimal-quad
+#
+
 hex2decq()
 { 
-  hex2inet $*
+  hex2inet $1
+}
+
+#
+# hex to octal
+#
+
+hex2oct()
+{
+  inet2oct $(hex2inet $1)
+}
+
+#
+# hex to hex-dotted-quad
+#
+
+hex2hexq()
+{
+  inet2hexq $(hex2inet $1)
+}
+
+#
+# hex to octal-dotted-quad
+#
+
+hex2octq()
+{
+  hex2octq $(hex2octq $1)
+}
+
+#
+# hex to decimal
+#
+
+hex2dec() 
+{
+  inet2dec $(hex2inet $1)
+}
+
+#
+# hex to decimal-dotted-quad
+#
+
+hex2decq()
+{
+  hex2inet $1
 }
 
 #
@@ -222,6 +315,24 @@ hexq2decq()
 }
 
 #
+# hexq2dec - dotted-hex-quad to decimal
+#
+
+hexq2dec()
+{
+  inet2dec $(hexq2inet $1)
+}
+
+#
+# hexq2oct - dotted-hex-quad to octal
+#
+
+hexq2oct()
+{
+  inet2oct $(hexq2inet $1)
+}
+
+#
 # oct2inet - octal to dotted-decimal-quad
 #
 oct2inet() {
@@ -230,9 +341,21 @@ oct2inet() {
   hex2inet $(printf "0x%x\n" $1)
 }
 
+#
+# oct2decq - octal to dotted-decimal-quad
+#
+
 oct2decq()
 { 
   oct2inet $*
+}
+
+#
+# oct2hex - octal to hex
+#
+
+oct2hex() {
+  inet2hex $(oct2inet $1)
 }
 
 #
@@ -271,6 +394,15 @@ octq2hexq()
  
   inet2hexq $(octq2inet $1)
 }
+
+#
+# octq2hex - dotted-octal-quad to hex
+#
+
+octq2hex()
+{
+  inet2hex $(octq2inet $1)
+}
   
 #
 # hexq2octq - dotted-hex-quad to dotted-octal-quad
@@ -281,4 +413,13 @@ hexq2octq()
   set -- $1
 
   inet2octq $(hexq2inet $1) 
+}
+
+#
+# hexq2oct - dotted-hex-quad to octal
+#
+
+hexq2oct() 
+{
+  inet2oct $(hexq2inet $1)
 }
