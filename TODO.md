@@ -12,3 +12,6 @@
   * https://hackerone.com/reports/128685
   * AppSecEU15 - Server side browsing considered harmful
     - note that it combines multiple formats in one address
+
+- Write warnings to stderr for invalid address
+  * for example, `$ inet2hex 256.256.256.256 => 0x100100100100`
